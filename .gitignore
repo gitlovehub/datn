@@ -1,0 +1,25 @@
+# =========================
+# CarService - Root GitIgnore
+# =========================
+
+# Frontend - React/Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Backend - Laravel
+backend/vendor/
+backend/.env
+backend/database/database.sqlite
+backend/storage/logs/*.log
+backend/bootstrap/cache/*.php
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

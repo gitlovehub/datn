@@ -1,0 +1,565 @@
+﻿import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import CustomerHeader from "../../components/CustomerHeader";
+import CustomerTopbar from "../../components/CustomerTopbar";
+import { fetchApi } from "../../services/api";
+
+type Appointment = {
+  id: string;
+  rawId: number | string;
+  car: string;
+  service: string;
+  date: string;
+  rawDate: string;
+  time: string;
+  status: string;
+  note: string;
+  licensePlate: string;
+};
+
+function getStatusLabel(status: string) {
+  const value = status.toLowerCase();
+
+  if (["confirmed", "approved", "Ä‘Ã£ xÃ¡c nháº­n", "confirmed_by_advisor"].includes(value)) {
+    return "ÄÃ£ xÃ¡c nháº­n";
+  }
+
+  if (["completed", "complete", "finished", "Ä‘Ã£ hoÃ n thÃ nh", "completed"].includes(value)) {
+    return "HoÃ n thÃ nh";
+  }
+
+  if (["cancelled", "canceled", "Ä‘Ã£ há»§y", "Ä‘Ã£ huá»·"].includes(value)) {
+    return "ÄÃ£ há»§y";
+  }
+
+  if (["in_progress", "processing", "Ä‘ang thá»±c hiá»‡n"].includes(value)) {
+    return "Äang thá»±c hiá»‡n";
+  }
+
+  if (["rejected", "declined", "tá»« chá»‘i"].includes(value)) {
+    return "Tá»« chá»‘i";
+  }
+
+  return "Chá» xÃ¡c nháº­n";
+}
+
+function getStatusStyle(status: string) {
+  switch (status) {
+    case "ÄÃ£ xÃ¡c nháº­n":
+      return "bg-[#E5EFE7] text-[#356344]";
+    case "HoÃ n thÃ nh":
+      return "bg-[#E8EAF5] text-[#444D88]";
+    case "ÄÃ£ há»§y":
+    case "Tá»« chá»‘i":
+      return "bg-[#FBE9E7] text-[#A33E36]";
+    case "Äang thá»±c hiá»‡n":
+      return "bg-[#FFF0D9] text-[#93611D]";
+    default:
+      return "bg-[#F3F4F2] text-[#66717C]";
+  }
+}
+
+function formatDate(value: unknown) {
+  if (!value || typeof value !== "string") {
+    return "ChÆ°a cÃ³ ngÃ y háº¹n";
+  }
+
+  const datePart = value.slice(0, 10);
+  const date = new Date(`${datePart}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("vi-VN");
+}
+
+function Appointments() {
+  const location = useLocation();
+  const isCustomerPage = location.pathname === "/customer/appointments";
+
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [status, setStatus] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null);
+  const [cancelLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState("");
+
+  const loadAppointments = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetchApi("/appointments");
+      const result = response?.data;
+
+      const items = Array.isArray(result)
+        ? result
+        : Array.isArray(result?.data)
+          ? result.data
+          : Array.isArray(response)
+            ? response
+            : [];
+
+      const formatted: Appointment[] = items.map((item: any) => {
+        const vehicle = item.vehicle ?? item.car ?? {};
+        const model = vehicle.model ?? {};
+        const brand = model.brand ?? vehicle.brand ?? {};
+
+        const carName =
+          [brand.name, model.name ?? vehicle.model_name]
+            .filter(Boolean)
+            .join(" ") ||
+          vehicle.name ||
+          vehicle.license_plate ||
+          "ChÆ°a cÃ³ thÃ´ng tin xe";
+
+        const rawStatus = String(item.status ?? "pending");
+
+        return {
+          id: String(item.appointment_code ?? item.code ?? item.id ?? ""),
+          rawId: item.id ?? item.appointment_id ?? item.appointment_code ?? "",
+          car: carName,
+          service:
+            item.service_name ??
+            item.service?.name ??
+            item.service?.service_name ??
+            "ChÆ°a cÃ³ thÃ´ng tin dá»‹ch vá»¥",
+          date: formatDate(item.appointment_date ?? item.date),
+          rawDate: String(item.appointment_date ?? item.date ?? ""),
+          time: String(item.appointment_time ?? item.time ?? ""),
+          status: getStatusLabel(rawStatus),
+          note: String(item.note ?? item.notes ?? ""),
+          licensePlate: String(vehicle.license_plate ?? ""),
+        };
+      });
+
+      setAppointments(formatted);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "KhÃ´ng thá»ƒ táº£i danh sÃ¡ch lá»‹ch háº¹n. Vui lÃ²ng thá»­ láº¡i."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadAppointments();
+  }, []);
+
+  const filteredAppointments = useMemo(() => {
+    const search = keyword.trim().toLowerCase();
+
+    return appointments.filter((appointment) => {
+      const matchStatus = !status || appointment.status === status;
+
+      const matchKeyword =
+        !search ||
+        appointment.id.toLowerCase().includes(search) ||
+        appointment.car.toLowerCase().includes(search) ||
+        appointment.service.toLowerCase().includes(search) ||
+        appointment.licensePlate.toLowerCase().includes(search);
+
+      return matchStatus && matchKeyword;
+    });
+  }, [appointments, keyword, status]);
+
+  const handleCancel = async () => {
+    if (!cancelTarget) {
+      return;
+    }
+
+    setActionMessage(
+      "Chá»©c nÄƒng há»§y lá»‹ch cáº§n endpoint há»§y lá»‹ch Ä‘Æ°á»£c há»— trá»£ bá»Ÿi API."
+    );
+    setCancelTarget(null);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F7F7F5] text-[#20252B]">
+      {isCustomerPage ? (
+        <>
+          <CustomerHeader />
+          <CustomerTopbar />
+        </>
+      ) : (
+        <Header />
+      )}
+
+      <main className={isCustomerPage ? "lg:ml-[250px]" : ""}>
+        <div className="mx-auto max-w-[1200px] px-6 py-10 md:py-14">
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#D6A85F]">
+                {isCustomerPage
+                  ? "KHÃCH HÃ€NG / Lá»ŠCH Háº¸N"
+                  : "CARSERVICE / Lá»ŠCH Háº¸N"}
+              </p>
+
+              <h1 className="mt-3 text-[30px] font-bold tracking-[-0.8px] text-[#1F2933]">
+                Lá»‹ch háº¹n
+              </h1>
+
+              <p className="mt-2 max-w-2xl text-[13px] leading-6 text-[#66717C]">
+                Quáº£n lÃ½ vÃ  theo dÃµi cÃ¡c lá»‹ch háº¹n báº£o dÆ°á»¡ng, sá»­a chá»¯a xe.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => void loadAppointments()}
+              disabled={loading}
+              className="rounded-xl border border-[#DDE1E4] bg-white px-4 py-3 text-[12px] font-semibold text-[#20252B] transition hover:border-[#D6A85F] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Äang táº£i..." : "â†» LÃ m má»›i"}
+            </button>
+          </div>
+
+          {actionMessage && (
+            <div className="mb-6 flex items-start justify-between gap-4 rounded-xl border border-[#E9D7B5] bg-[#FFF8EA] px-4 py-3 text-[13px] text-[#765526]">
+              <p>{actionMessage}</p>
+              <button
+                type="button"
+                onClick={() => setActionMessage("")}
+                className="font-bold"
+              >
+                Ã—
+              </button>
+            </div>
+          )}
+
+          <div className="mb-7 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-[#E1E4E6] bg-white p-5 shadow-[0_8px_25px_rgba(31,41,51,0.04)]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#8A949E]">
+                Tá»”NG Lá»ŠCH Háº¸N
+              </p>
+              <p className="mt-2 text-2xl font-bold tracking-tight text-[#20252B]">
+                {appointments.length}
+              </p>
+              <p className="mt-3 text-[11px] text-[#66717C]">
+                Tá»•ng sá»‘ lá»‹ch háº¹n táº£i Ä‘Æ°á»£c tá»« há»‡ thá»‘ng.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#E1E4E6] bg-white p-5 shadow-[0_8px_25px_rgba(31,41,51,0.04)]">
+              <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#8A949E]">
+                Káº¾T QUáº¢ HIá»†N Táº I
+              </p>
+              <p className="mt-2 text-2xl font-bold tracking-tight text-[#20252B]">
+                {filteredAppointments.length}
+              </p>
+              <p className="mt-3 text-[11px] text-[#66717C]">
+                Sá»‘ lá»‹ch háº¹n phÃ¹ há»£p vá»›i bá»™ lá»c.
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-7 overflow-hidden rounded-2xl border border-[#E1E4E6] bg-white shadow-[0_8px_25px_rgba(31,41,51,0.04)]">
+            <div className="border-b border-[#E1E4E6] px-6 py-5">
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#D6A85F]">
+                Bá»˜ Lá»ŒC
+              </p>
+              <h2 className="mt-1 text-[17px] font-bold text-[#20252B]">
+                TÃ¬m kiáº¿m lá»‹ch háº¹n
+              </h2>
+              <p className="mt-1 text-[11px] text-[#66717C]">
+                TÃ¬m theo mÃ£ lá»‹ch háº¹n, tÃªn xe, biá»ƒn sá»‘ hoáº·c dá»‹ch vá»¥.
+              </p>
+            </div>
+
+            <div className="grid gap-4 p-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-[13px] font-semibold text-[#20252B]">
+                  Tá»« khÃ³a
+                </label>
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(event) => setKeyword(event.target.value)}
+                  placeholder="Nháº­p mÃ£ lá»‹ch háº¹n, tÃªn xe..."
+                  className="w-full rounded-xl border border-[#DDE1E4] bg-[#FAFAF9] px-4 py-3 text-[13px] text-[#20252B] outline-none transition placeholder:text-[#9AA3AA] focus:border-[#D6A85F] focus:bg-white focus:ring-2 focus:ring-[#D6A85F]/10"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-[13px] font-semibold text-[#20252B]">
+                  Tráº¡ng thÃ¡i
+                </label>
+                <select
+                  value={status}
+                  onChange={(event) => setStatus(event.target.value)}
+                  className="w-full cursor-pointer rounded-xl border border-[#DDE1E4] bg-[#FAFAF9] px-4 py-3 text-[13px] text-[#20252B] outline-none transition focus:border-[#D6A85F] focus:bg-white focus:ring-2 focus:ring-[#D6A85F]/10"
+                >
+                  <option value="">Táº¥t cáº£ tráº¡ng thÃ¡i</option>
+                  <option value="Chá» xÃ¡c nháº­n">Chá» xÃ¡c nháº­n</option>
+                  <option value="ÄÃ£ xÃ¡c nháº­n">ÄÃ£ xÃ¡c nháº­n</option>
+                  <option value="Äang thá»±c hiá»‡n">Äang thá»±c hiá»‡n</option>
+                  <option value="HoÃ n thÃ nh">HoÃ n thÃ nh</option>
+                  <option value="ÄÃ£ há»§y">ÄÃ£ há»§y</option>
+                  <option value="Tá»« chá»‘i">Tá»« chá»‘i</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-[#E1E4E6] bg-white shadow-[0_8px_25px_rgba(31,41,51,0.04)]">
+            <div className="flex flex-col gap-3 border-b border-[#E1E4E6] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#D6A85F]">
+                  APPOINTMENTS
+                </p>
+                <h2 className="mt-1 text-[17px] font-bold text-[#20252B]">
+                  Danh sÃ¡ch lá»‹ch háº¹n
+                </h2>
+              </div>
+              <span className="w-fit rounded-full bg-[#F3F4F2] px-3 py-1.5 text-[11px] font-semibold text-[#66717C]">
+                {filteredAppointments.length} káº¿t quáº£
+              </span>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[900px] text-left">
+                <thead>
+                  <tr className="border-b border-[#E1E4E6] bg-[#FAFAF9] text-[10px] font-bold uppercase tracking-[0.08em] text-[#8A949E]">
+                    <th className="px-6 py-4">STT</th>
+                    <th className="px-6 py-4">MÃ£ lá»‹ch háº¹n</th>
+                    <th className="px-6 py-4">Xe</th>
+                    <th className="px-6 py-4">Dá»‹ch vá»¥</th>
+                    <th className="px-6 py-4">NgÃ y háº¹n</th>
+                    <th className="px-6 py-4">Tráº¡ng thÃ¡i</th>
+                    <th className="px-6 py-4">Thao tÃ¡c</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {loading && (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center text-sm text-[#66717C]">
+                        Äang táº£i danh sÃ¡ch lá»‹ch háº¹n...
+                      </td>
+                    </tr>
+                  )}
+
+                  {!loading && error && (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-12 text-center">
+                        <p className="text-sm font-semibold text-red-600">{error}</p>
+                        <button
+                          type="button"
+                          onClick={() => void loadAppointments()}
+                          className="mt-4 rounded-xl bg-[#1F2933] px-4 py-2.5 text-xs font-semibold text-white"
+                        >
+                          Thá»­ láº¡i
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+
+                  {!loading && !error && filteredAppointments.map((appointment, index) => (
+                    <tr
+                      key={`${appointment.id}-${index}`}
+                      className="border-b border-[#EEF0F2] last:border-b-0 transition hover:bg-[#FAFAF9]"
+                    >
+                      <td className="px-6 py-5 text-[12px] text-[#8A949E]">
+                        {String(index + 1).padStart(2, "0")}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="text-[12px] font-bold text-[#20252B]">
+                          {appointment.id || "ChÆ°a cÃ³ mÃ£"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1F2933] text-sm text-white">
+                            ðŸš—
+                          </div>
+                          <div>
+                            <p className="text-[13px] font-bold text-[#20252B]">
+                              {appointment.car}
+                            </p>
+                            <p className="mt-1 text-[11px] text-[#8A949E]">
+                              {appointment.licensePlate || "PhÆ°Æ¡ng tiá»‡n cÃ¡ nhÃ¢n"}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-[12px] text-[#66717C]">
+                        {appointment.service}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className="text-[12px] font-semibold text-[#20252B]">
+                          {appointment.date}
+                        </span>
+                        {appointment.time && (
+                          <p className="mt-1 text-[11px] text-[#8A949E]">
+                            {appointment.time.slice(0, 5)}
+                          </p>
+                        )}
+                      </td>
+                      <td className="px-6 py-5">
+                        <span className={`rounded-full px-3 py-1.5 text-[10px] font-semibold ${getStatusStyle(appointment.status)}`}>
+                          {appointment.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5">
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedAppointment(appointment)}
+                            className="cursor-pointer rounded-xl bg-[#1F2933] px-3.5 py-2.5 text-[11px] font-semibold text-white transition hover:bg-[#151D24]"
+                          >
+                            Xem chi tiáº¿t
+                          </button>
+                          {["Chá» xÃ¡c nháº­n", "ÄÃ£ xÃ¡c nháº­n"].includes(appointment.status) && (
+                            <button
+                              type="button"
+                              onClick={() => setCancelTarget(appointment)}
+                              className="cursor-pointer rounded-xl border border-[#DDE1E4] bg-white px-3.5 py-2.5 text-[11px] font-medium text-[#20252B] transition hover:border-red-300 hover:text-red-600"
+                            >
+                              Há»§y lá»‹ch
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {!loading && !error && filteredAppointments.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-6 py-14 text-center">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F3F4F2] text-sm text-[#66717C]">
+                          â€”
+                        </div>
+                        <p className="mt-4 text-sm font-semibold text-[#20252B]">
+                          {appointments.length === 0
+                            ? "Báº¡n chÆ°a cÃ³ lá»‹ch háº¹n nÃ o"
+                            : "KhÃ´ng tÃ¬m tháº¥y lá»‹ch háº¹n"}
+                        </p>
+                        <p className="mt-1 text-[11px] text-[#8A949E]">
+                          {appointments.length === 0
+                            ? "Lá»‹ch háº¹n cá»§a báº¡n sáº½ xuáº¥t hiá»‡n táº¡i Ä‘Ã¢y sau khi Ä‘Æ°á»£c ghi nháº­n."
+                            : "Thá»­ thay Ä‘á»•i tá»« khÃ³a hoáº·c tráº¡ng thÃ¡i tÃ¬m kiáº¿m."}
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-2xl border border-[#E1E4E6] bg-white p-5">
+            <div className="flex items-start gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F3E8D2] text-xs font-bold text-[#1F2933]">
+                i
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#20252B]">Quáº£n lÃ½ lá»‹ch háº¹n</p>
+                <p className="mt-1 text-[11px] leading-5 text-[#66717C]">
+                  Theo dÃµi ngÃ y háº¹n, dá»‹ch vá»¥ vÃ  tráº¡ng thÃ¡i xá»­ lÃ½ lá»‹ch háº¹n táº¡i CarService.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {!isCustomerPage && <Footer />}
+
+      {selectedAppointment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#D6A85F]">
+                  APPOINTMENT DETAILS
+                </p>
+                <h2 className="mt-2 text-xl font-bold text-[#1F2933]">
+                  Chi tiáº¿t lá»‹ch háº¹n
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedAppointment(null)}
+                className="text-2xl text-[#66717C]"
+              >
+                Ã—
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {[
+                ["MÃ£ lá»‹ch háº¹n", selectedAppointment.id],
+                ["Xe", selectedAppointment.car],
+                ["Biá»ƒn sá»‘", selectedAppointment.licensePlate || "ChÆ°a cÃ³ thÃ´ng tin"],
+                ["Dá»‹ch vá»¥", selectedAppointment.service],
+                ["NgÃ y háº¹n", selectedAppointment.date],
+                ["Giá» háº¹n", selectedAppointment.time || "ChÆ°a cÃ³ thÃ´ng tin"],
+                ["Tráº¡ng thÃ¡i", selectedAppointment.status],
+                ["Ghi chÃº", selectedAppointment.note || "KhÃ´ng cÃ³ ghi chÃº"],
+              ].map(([label, value]) => (
+                <div key={label} className="flex justify-between gap-4 border-b border-[#EEF0F2] pb-3">
+                  <span className="text-[12px] text-[#66717C]">{label}</span>
+                  <span className="max-w-[65%] text-right text-[12px] font-semibold text-[#20252B]">
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSelectedAppointment(null)}
+              className="mt-6 w-full rounded-xl bg-[#1F2933] px-4 py-3 text-sm font-semibold text-white"
+            >
+              ÄÃ³ng
+            </button>
+          </div>
+        </div>
+      )}
+
+      {cancelTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-bold text-[#1F2933]">XÃ¡c nháº­n há»§y lá»‹ch</h2>
+            <p className="mt-3 text-sm leading-6 text-[#66717C]">
+              Cáº­u cÃ³ cháº¯c muá»‘n há»§y lá»‹ch háº¹n{" "}
+              <span className="font-bold text-[#20252B]">{cancelTarget.id}</span> khÃ´ng?
+            </p>
+            <p className="mt-2 text-xs leading-5 text-[#8A949E]">
+              Thao tÃ¡c há»§y chÆ°a Ä‘Æ°á»£c káº¿t ná»‘i vÃ¬ cáº§n xÃ¡c Ä‘á»‹nh endpoint há»§y lá»‹ch cá»§a API.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setCancelTarget(null)}
+                className="flex-1 rounded-xl border border-[#DDE1E4] px-4 py-3 text-sm font-semibold text-[#20252B]"
+              >
+                Quay láº¡i
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleCancel()}
+                disabled={cancelLoading}
+                className="flex-1 rounded-xl bg-[#1F2933] px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                XÃ¡c nháº­n
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Appointments;

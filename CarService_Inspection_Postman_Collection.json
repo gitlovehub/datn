@@ -1,0 +1,379 @@
+{
+	"info": {
+		"_postman_id": "c1f7b8a2-carservice-inspection-collection",
+		"name": "CarService - Inspection & Diagnosis API",
+		"description": "Bộ test case Postman hoàn chỉnh cho module Kiểm tra, Chẩn đoán xe & Đề xuất sửa chữa (Inspection)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "technicianToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "advisorToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "customerToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "repairOrderId",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Authentication (Lấy Token)",
+			"item": [
+				{
+					"name": "0.1 Đăng nhập KTV (Jane Beahan)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('technicianToken', jsonData.token);",
+									"    console.log('Saved technicianToken');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"jane.beahan@example.org\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "0.2 Đăng nhập Cố vấn (Advisor Test)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('advisorToken', jsonData.token);",
+									"    console.log('Saved advisorToken');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"advisor.test@carservice.test\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["login"]
+						}
+					}
+				},
+				{
+					"name": "0.3 Đăng nhập Khách hàng (Customer Test)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('customerToken', jsonData.token);",
+									"    console.log('Saved customerToken');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"customer.test@carservice.test\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "1. POST Tạo phiếu kiểm tra",
+			"item": [
+				{
+					"name": "1.1 [201 Created] Tạo phiếu chẩn đoán thành công (Happy Path)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"condition_description\": \"Xe bị rung lắc phần đầu xe khi phanh ở tốc độ cao\",\n    \"diagnosis\": \"Má phanh trước mòn dưới chuẩn an toàn, lốp trước mòn vẹt\",\n    \"inspection_items\": [\n        {\n            \"item_name\": \"Má phanh trước\",\n            \"status\": \"FAILED\",\n            \"condition_description\": \"Độ dày còn 1.5mm, có vết rãnh xước\",\n            \"note\": \"Cần thay mới ngay lập tức\"\n        },\n        {\n            \"item_name\": \"Lốp xe trước\",\n            \"status\": \"WARNING\",\n            \"condition_description\": \"Gai lốp còn 2.5mm, có dấu hiệu mòn lệch\",\n            \"note\": \"Cần cân chỉnh góc đặt bánh xe và theo dõi\"\n        },\n        {\n            \"item_name\": \"Đèn pha & xi nhan\",\n            \"status\": \"PASSED\",\n            \"condition_description\": \"Hoạt động bình thường\",\n            \"note\": null\n        }\n    ],\n    \"recommendations\": [\n        {\n            \"item_type\": \"SERVICE\",\n            \"service_id\": 1,\n            \"quantity\": 1,\n            \"note\": \"Công bảo dưỡng hệ thống phanh\"\n        },\n        {\n            \"item_type\": \"PART\",\n            \"part_id\": 1,\n            \"quantity\": 1,\n            \"note\": \"Bộ má phanh trước Ceramic\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections"]
+						}
+					}
+				},
+				{
+					"name": "1.2 [422 Error] Validate sai status (Không thuộc PASSED/WARNING/FAILED)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inspection_items\": [\n        {\n            \"item_name\": \"Má phanh trước\",\n            \"status\": \"INVALID_STATUS\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections"]
+						}
+					}
+				},
+				{
+					"name": "1.3 [422 Error] Nghiệp vụ - Tạo trùng phiếu kiểm tra cho cùng 1 RO",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inspection_items\": [\n        {\n            \"item_name\": \"Ắc quy\",\n            \"status\": \"PASSED\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections"]
+						}
+					}
+				},
+				{
+					"name": "1.4 [403 Forbidden] Khách hàng gọi API tạo phiếu của KTV",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customerToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"inspection_items\": [\n        {\n            \"item_name\": \"Đèn\",\n            \"status\": \"PASSED\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. GET Xem chi tiết phiếu kiểm tra",
+			"item": [
+				{
+					"name": "2.1 [200 OK] Kỹ thuật viên xem chi tiết phiếu kiểm tra",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections"]
+						}
+					}
+				},
+				{
+					"name": "2.2 [200 OK] Cố vấn xem chi tiết phiếu kiểm tra để làm Báo giá",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{advisorToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections"]
+						}
+					}
+				},
+				{
+					"name": "2.3 [404 Not Found] Xem Lệnh sửa chữa chưa tạo phiếu kiểm tra",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/9999/inspections",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "9999", "inspections"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. POST Thêm đề xuất phụ tùng / dịch vụ",
+			"item": [
+				{
+					"name": "3.1 [201 Created] Thêm 1 đề xuất phụ tùng lẻ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_type\": \"PART\",\n    \"part_id\": 2,\n    \"quantity\": 1,\n    \"note\": \"Đề xuất thay thêm lọc gió động cơ Denso do bám bụi nặng\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections/recommendations",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections", "recommendations"]
+						}
+					}
+				},
+				{
+					"name": "3.2 [201 Created] Thêm 1 đề xuất dịch vụ lẻ",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_type\": \"SERVICE\",\n    \"service_id\": 2,\n    \"quantity\": 1,\n    \"note\": \"Đề xuất cân chỉnh góc đặt bánh xe\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections/recommendations",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections", "recommendations"]
+						}
+					}
+				},
+				{
+					"name": "3.3 [422 Error] Validate sai part_id không tồn tại",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_type\": \"PART\",\n    \"part_id\": 99999,\n    \"quantity\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections/recommendations",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections", "recommendations"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. POST Chốt hoàn tất chẩn đoán (Complete)",
+			"item": [
+				{
+					"name": "4.1 [200 OK] KTV chốt kiểm tra - Chuyển RO sang QUOTING",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{technicianToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections/complete",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections", "complete"]
+						}
+					}
+				},
+				{
+					"name": "4.2 [403 Forbidden] Cố vấn hoặc Khách hàng cố gọi Complete",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{advisorToken}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/repair-orders/{{repairOrderId}}/inspections/complete",
+							"host": ["{{baseUrl}}"],
+							"path": ["repair-orders", "{{repairOrderId}}", "inspections", "complete"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,327 @@
+﻿import { useState } from "react";
+import { Link } from "react-router-dom";
+import AdvisorSidebar from "./AdvisorSidebar";
+import AdvisorTopbar from "./AdvisorTopbar";
+
+const cars = [
+  {
+    id: 1,
+    plate: "30A-123.45",
+    customer: "Nguyá»…n Tiáº¿n Hiá»n",
+    phone: "0901234567",
+    brand: "Toyota",
+    model: "Vios",
+    year: 2021,
+    status: "Äang sá»­ dá»¥ng",
+  },
+  {
+    id: 2,
+    plate: "30F-678.90",
+    customer: "PhÃ¹ng Äá»©c Anh",
+    phone: "0912345678",
+    brand: "Honda",
+    model: "City",
+    year: 2022,
+    status: "Äang sá»­ dá»¥ng",
+  },
+  {
+    id: 3,
+    plate: "29A-456.78",
+    customer: "BÃ¹i Viá»‡t",
+    phone: "0987654321",
+    brand: "Mazda",
+    model: "Mazda 3",
+    year: 2020,
+    status: "Äang sá»­ dá»¥ng",
+  },
+];
+
+function CustomerCars() {
+  const [search, setSearch] = useState("");
+  const [brand, setBrand] = useState("");
+
+  const filteredCars = cars.filter((car) => {
+    const keyword = search.toLowerCase();
+
+    const matchSearch =
+      car.plate.toLowerCase().includes(keyword) ||
+      car.customer.toLowerCase().includes(keyword) ||
+      car.phone.includes(search) ||
+      car.model.toLowerCase().includes(keyword);
+
+    const matchBrand = brand === "" || car.brand === brand;
+
+    return matchSearch && matchBrand;
+  });
+
+  return (
+    <div className="min-h-screen bg-[#F7F7F5] text-[#20252B]">
+      <AdvisorSidebar />
+
+      <div className="lg:ml-[250px]">
+        <AdvisorTopbar />
+
+        <main>
+          <div className="mx-auto max-w-[1200px] px-6 py-8 lg:px-8 lg:py-10">
+            <div className="mb-8">
+              <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.14em] text-[#8A949E]">
+                GARA / XE KHÃCH HÃ€NG
+              </p>
+
+              <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+                <div>
+                  <h2 className="text-[24px] font-bold tracking-tight text-[#20252B]">
+                    Quáº£n lÃ½ xe khÃ¡ch hÃ ng
+                  </h2>
+
+                  <p className="mt-2 max-w-[620px] text-[12px] leading-5 text-[#8A949E]">
+                    Theo dÃµi thÃ´ng tin xe thuá»™c khÃ¡ch hÃ ng táº¡i gara.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="w-fit rounded-xl bg-[#1F2933] px-4 py-2.5 text-[11px] font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-[#151D24] hover:shadow-md"
+                >
+                  + ThÃªm xe
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-[#E1E4E6] bg-white p-5 shadow-[0_4px_20px_rgba(31,41,51,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#D6A85F] hover:shadow-[0_12px_30px_rgba(31,41,51,0.08)]">
+                <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#8A949E]">
+                  Tá»”NG Sá» XE
+                </p>
+
+                <p className="mt-3 text-[24px] font-bold text-[#20252B]">
+                  {cars.length}
+                </p>
+
+                <p className="mt-1 text-[10px] text-[#8A949E]">
+                  Xe Ä‘ang Ä‘Æ°á»£c quáº£n lÃ½
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-[#E1E4E6] bg-white p-5 shadow-[0_4px_20px_rgba(31,41,51,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#D6A85F] hover:shadow-[0_12px_30px_rgba(31,41,51,0.08)]">
+                <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#8A949E]">
+                  Káº¾T QUáº¢
+                </p>
+
+                <p className="mt-3 text-[24px] font-bold text-[#20252B]">
+                  {filteredCars.length}
+                </p>
+
+                <p className="mt-1 text-[10px] text-[#8A949E]">
+                  Xe Ä‘ang hiá»ƒn thá»‹
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-[#E1E4E6] bg-white p-5 shadow-[0_4px_20px_rgba(31,41,51,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#D6A85F] hover:shadow-[0_12px_30px_rgba(31,41,51,0.08)]">
+                <p className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#8A949E]">
+                  VAI TRÃ’
+                </p>
+
+                <p className="mt-3 text-[14px] font-bold text-[#20252B]">
+                  Cá»‘ váº¥n dá»‹ch vá»¥
+                </p>
+
+                <p className="mt-1 text-[10px] text-[#8A949E]">
+                  KhÃ´ng gian lÃ m viá»‡c
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6 rounded-2xl border border-[#E1E4E6] bg-white p-5 shadow-[0_4px_20px_rgba(31,41,51,0.04)]">
+              <div className="mb-5">
+                <p className="text-[13px] font-semibold text-[#20252B]">
+                  TÃ¬m kiáº¿m xe
+                </p>
+
+                <p className="mt-1 text-[10px] text-[#8A949E]">
+                  TÃ¬m theo biá»ƒn sá»‘, tÃªn khÃ¡ch hÃ ng, sá»‘ Ä‘iá»‡n thoáº¡i hoáº·c máº«u xe.
+                </p>
+              </div>
+
+              <div className="grid gap-3 lg:grid-cols-[1.5fr_1fr_auto]">
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Biá»ƒn sá»‘, tÃªn khÃ¡ch hÃ ng, sá»‘ Ä‘iá»‡n thoáº¡i..."
+                  className="w-full rounded-xl border border-[#D9DDE1] bg-white px-4 py-3 text-[12px] outline-none transition duration-200 placeholder:text-[#A0A8AF] focus:border-[#D6A85F] focus:ring-2 focus:ring-[#D6A85F]/10"
+                />
+
+                <select
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                  className="rounded-xl border border-[#D9DDE1] bg-white px-4 py-3 text-[12px] outline-none transition duration-200 focus:border-[#D6A85F] focus:ring-2 focus:ring-[#D6A85F]/10"
+                >
+                  <option value="">Táº¥t cáº£ hÃ£ng xe</option>
+                  <option value="Toyota">Toyota</option>
+                  <option value="Honda">Honda</option>
+                  <option value="Mazda">Mazda</option>
+                </select>
+
+                <button
+                  type="button"
+                  className="rounded-xl bg-[#1F2933] px-5 py-3 text-[11px] font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#151D24] hover:shadow-md"
+                >
+                  TÃ¬m kiáº¿m
+                </button>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <p className="text-[10px] text-[#8A949E]">
+                  CÃ³ thá»ƒ tÃ¬m nhanh báº±ng biá»ƒn sá»‘ xe.
+                </p>
+
+                {(search || brand) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearch("");
+                      setBrand("");
+                    }}
+                    className="text-[10px] font-semibold text-[#66717C] transition hover:text-[#20252B]"
+                  >
+                    XÃ³a bá»™ lá»c
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-[#E1E4E6] bg-white shadow-[0_4px_20px_rgba(31,41,51,0.04)]">
+              <div className="flex flex-col gap-3 border-b border-[#EEF0F2] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-[13px] font-semibold text-[#20252B]">
+                    Danh sÃ¡ch xe khÃ¡ch hÃ ng
+                  </p>
+
+                  <p className="mt-1 text-[10px] text-[#8A949E]">
+                    ThÃ´ng tin phÆ°Æ¡ng tiá»‡n Ä‘ang quáº£n lÃ½
+                  </p>
+                </div>
+
+                <p className="w-fit rounded-lg bg-[#F3F4F2] px-3 py-1.5 text-[10px] font-semibold text-[#66717C]">
+                  {filteredCars.length} xe
+                </p>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[900px] border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#E1E4E6] bg-[#F7F7F5] text-left">
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        STT
+                      </th>
+
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        BIá»‚N Sá»
+                      </th>
+
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        KHÃCH HÃ€NG
+                      </th>
+
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        HÃƒNG / MáºªU XE
+                      </th>
+
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        NÄ‚M SX
+                      </th>
+
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        TRáº NG THÃI
+                      </th>
+
+                      <th className="px-5 py-3 text-[9px] font-bold text-[#8A949E]">
+                        THAO TÃC
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {filteredCars.map((car, index) => (
+                      <tr
+                        key={car.id}
+                        className="border-b border-[#EEF0F2] last:border-0 transition duration-200 hover:bg-[#FAFAF9]"
+                      >
+                        <td className="px-5 py-4 text-[11px] text-[#66717C]">
+                          {index + 1}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <span className="rounded-lg bg-[#F3F4F2] px-3 py-1.5 text-[10px] font-bold text-[#20252B]">
+                            {car.plate}
+                          </span>
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <p className="text-[11px] font-semibold text-[#20252B]">
+                            {car.customer}
+                          </p>
+
+                          <p className="mt-1 text-[9px] text-[#8A949E]">
+                            {car.phone}
+                          </p>
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <p className="text-[11px] font-semibold text-[#20252B]">
+                            {car.brand}
+                          </p>
+
+                          <p className="mt-1 text-[9px] text-[#8A949E]">
+                            {car.model}
+                          </p>
+                        </td>
+
+                        <td className="px-5 py-4 text-[11px] text-[#66717C]">
+                          {car.year}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <span className="rounded-lg bg-[#EEF7F0] px-3 py-1.5 text-[9px] font-semibold text-[#39734A]">
+                            {car.status}
+                          </span>
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <Link
+                            to="/advisor/appointments"
+                            className="inline-flex rounded-lg border border-[#D9DDE1] px-3 py-1.5 text-[10px] font-semibold text-[#374151] transition duration-200 hover:-translate-y-0.5 hover:border-[#D6A85F] hover:bg-[#F7F2E9]"
+                          >
+                            Lá»‹ch háº¹n
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {filteredCars.length === 0 && (
+                <div className="px-5 py-14 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F3F4F2] text-[#66717C]">
+                    <span className="text-lg">âŒ•</span>
+                  </div>
+
+                  <p className="mt-4 text-[12px] font-semibold text-[#20252B]">
+                    KhÃ´ng tÃ¬m tháº¥y xe
+                  </p>
+
+                  <p className="mt-1 text-[10px] text-[#8A949E]">
+                    Thá»­ thay Ä‘á»•i tá»« khÃ³a hoáº·c hÃ£ng xe.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default CustomerCars;

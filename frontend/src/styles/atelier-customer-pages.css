@@ -1,0 +1,88 @@
+/* ATELIER Customer: cards and timelines reflect API data, never demo localStorage. */
+.at-customer-page{min-height:calc(100vh - 180px);padding:46px 22px 65px;color:var(--cs-text);background:var(--cs-bg)}
+.at-customer-container{max-width:1200px;margin:auto}
+.at-customer-heading{display:flex;align-items:end;justify-content:space-between;gap:22px;margin-bottom:28px}
+.at-customer-eyebrow{font-size:12px;letter-spacing:.16em;font-weight:800;color:var(--cs-accent);margin-bottom:10px}
+.at-customer-heading h1{font:800 clamp(29px,4vw,46px)/1.16 Manrope,system-ui,sans-serif;letter-spacing:-.055em}
+.at-customer-heading p:not(.at-customer-eyebrow){margin-top:10px;color:var(--cs-muted);font-size:14px}
+.at-customer-primary{border:1px solid var(--cs-accent,#cf2935);background:var(--cs-accent,#cf2935);color:var(--cs-accent-contrast,#fff)!important;font-weight:800;font-size:13px;border-radius:11px;padding:11px 18px;min-height:40px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.at-customer-primary:hover:not(:disabled){background:color-mix(in srgb,var(--cs-accent,#cf2935) 88%,#000);border-color:color-mix(in srgb,var(--cs-accent,#cf2935) 88%,#000);box-shadow:0 6px 16px -10px rgba(0,0,0,.45);transform:translateY(-1px)}
+.at-customer-outline{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;border:1px solid var(--cs-border);border-radius:11px;padding:9px 15px;background:var(--cs-surface-2,transparent);color:var(--cs-text)!important;font-weight:750;font-size:13px;margin-top:18px}
+.at-customer-outline:hover:not(:disabled){background:var(--cs-soft);border-color:var(--cs-accent);color:var(--cs-text)!important;box-shadow:0 6px 16px -10px rgba(0,0,0,.45);transform:translateY(-1px)}
+.at-customer-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:28px 0 22px}
+.at-customer-stat{min-height:137px;padding:24px;background:var(--cs-surface);border:1px solid var(--cs-border);border-radius:18px;display:flex;flex-direction:column;align-items:flex-start}
+.at-customer-stat span{font-size:12px;font-weight:800;letter-spacing:.065em;color:var(--cs-muted)}
+.at-customer-stat strong{margin:8px 0;font-size:30px;line-height:1.3;font-weight:800}
+.at-customer-stat small{font-size:12px;color:var(--cs-muted)}
+.at-customer-filter{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin:22px 0}
+.at-customer-filter label{font-size:12px;font-weight:750;align-self:center}
+.at-customer-filter :is(select,input){background:var(--cs-surface);color:var(--cs-text);border:1px solid var(--cs-border);border-radius:10px;padding:10px 13px;min-height:43px;max-width:100%;font-size:13px}
+.at-customer-filter :is(select,input):focus-visible{outline:2px solid var(--cs-accent);outline-offset:1px}
+.at-customer-filter input{flex:1;min-width:190px}
+.at-customer-empty{padding:48px 20px;text-align:center;background:var(--cs-surface);border:1px solid var(--cs-border);border-radius:18px;color:var(--cs-muted);margin:18px 0}
+.at-customer-empty h2{font-size:17px;font-weight:800;color:var(--cs-text);margin-bottom:8px}
+.at-customer-empty .at-customer-primary{margin-top:19px}
+.at-customer-notice{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:14px 0;border:1px solid #426c4d;border-radius:12px;padding:13px 16px;color:#b8eac3;background:#20362a}
+.at-customer-error{border-color:#a64753;background:#45272d;color:#ffb1b9}
+.at-customer-notice button{border:1px solid currentColor;border-radius:8px;padding:6px 9px}
+.at-appointment-card,.at-tracking-card{background:var(--cs-surface);border:1px solid var(--cs-border);border-radius:18px;padding:26px;margin-bottom:18px}
+.at-appointment-top{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-bottom:25px;border-bottom:1px solid var(--cs-border)}
+.at-appointment-code{font-size:13px;font-weight:800;letter-spacing:.11em;color:var(--cs-accent);margin-bottom:9px}
+.at-appointment-top h2{font:800 19px/1.3 Manrope,system-ui,sans-serif;letter-spacing:-.025em}
+.at-appointment-description{color:var(--cs-muted);margin-top:5px;font-size:13px}
+.at-customer-status{border-radius:999px;padding:8px 11px;font-size:12px;white-space:nowrap;font-weight:800;background:#2c394b;color:#99c0f7}
+.at-customer-status.is-pending{background:#4a3222;color:#f7c577}
+.at-customer-status.is-confirmed{background:#283f5e;color:#a0cbfc}
+.at-customer-status.is-cancelled{background:#49282f;color:#ffadb2}
+html[data-theme="light"] .at-customer-status.is-pending{background:#ffeed7;color:#9f5b15}
+html[data-theme="light"] .at-customer-status.is-confirmed{background:#e6efff;color:#305c95}
+html[data-theme="light"] .at-customer-status.is-cancelled{background:#ffeaed;color:#aa3644}
+.at-appointment-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:22px}
+.at-appointment-bottom strong{font-size:13px}
+.at-appointment-actions{display:flex;gap:9px;flex-wrap:wrap}
+.at-appointment-actions button,.at-customer-pagination button{border:1px solid var(--cs-border);border-radius:10px;padding:11px 15px;color:var(--cs-text);font-size:12px;font-weight:750;background:var(--cs-surface)}
+.at-appointment-actions button:hover,.at-customer-pagination button:not(:disabled):hover{background:var(--cs-surface-2);border-color:var(--cs-accent)}
+.at-customer-pagination{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:20px 0;font-size:12px;color:var(--cs-muted)}
+.at-customer-pagination>div{display:flex;gap:8px}.at-customer-pagination button:disabled{opacity:.45;cursor:not-allowed}
+.at-tracking-details{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:22px}
+.at-tracking-details h3{font:800 16px Manrope,system-ui,sans-serif;margin-bottom:20px}
+.at-tracking-timeline{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0}
+.at-tracking-timeline li{border-left:2px solid var(--cs-border);position:relative;padding:0 0 19px 19px;font-size:13px;color:var(--cs-muted)}
+.at-tracking-timeline li::before{content:"";position:absolute;left:-7px;top:1px;width:12px;height:12px;border-radius:100%;border:2px solid var(--cs-accent);background:var(--cs-bg)}
+.at-tracking-timeline li.is-done{color:var(--cs-text);font-weight:700}.at-tracking-timeline li.is-done::before{background:var(--cs-accent)}
+.at-tracking-timeline li small{display:block;font-size:12px;margin-top:7px;color:var(--cs-accent)}
+.at-tracking-note{color:var(--cs-muted);font-size:13px;line-height:1.8;margin-bottom:10px}
+/* Safely bridge remaining customer business modules into same palette, no backend changes. */
+.cs-customer-main :is(.hover\:bg-\[\#FAFAF9\],.hover\:bg-\[\#FAFAF8\]):hover{background:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-customer-main :is(.text-\[\#8A949E\],.text-\[\#AEB8C1\]){color:var(--cs-muted)!important}
+@media(max-width:760px){.at-customer-page{padding:28px 15px 40px}.at-customer-heading{align-items:start;flex-direction:column}.at-customer-stats{gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}.at-customer-stats>div:first-child{grid-column:span 2}.at-customer-stat{min-height:108px;padding:16px}.at-appointment-top,.at-appointment-bottom{align-items:flex-start;flex-direction:column}.at-tracking-details{grid-template-columns:1fr}}
+
+/* Repair tracking: original ATELIER two-column timeline and real Laravel status journal. */
+.at-customer-tracking .at-customer-container{max-width:1200px}
+.at-customer-tracking .at-tracking-card{padding:30px 28px;margin-bottom:22px}
+.at-customer-tracking .at-tracking-details{gap:clamp(25px,5vw,60px);margin-top:23px;grid-template-columns:1fr 1fr}
+.at-customer-tracking .at-tracking-details h3{font-size:17px;margin-bottom:22px}
+.at-customer-tracking .at-tracking-timeline li{padding:0 0 21px 29px;border-left:0;min-height:43px;color:var(--cs-text)}
+.at-customer-tracking .at-tracking-timeline li::before{top:5px;left:2px;width:12px;height:12px;border:2px solid var(--cs-accent);background:var(--cs-surface);z-index:1}
+.at-customer-tracking .at-tracking-timeline li::after{content:"";position:absolute;left:7px;top:16px;bottom:0;width:1px;background:var(--cs-border)}
+.at-customer-tracking .at-tracking-timeline li:last-child::after{display:none}
+.at-customer-tracking .at-tracking-timeline li.is-done::before,
+.at-customer-tracking .at-tracking-timeline li.is-current::before{background:var(--cs-accent)}
+.at-customer-tracking .at-tracking-timeline li.is-future{opacity:.48}
+.at-customer-tracking .at-tracking-timeline li.is-future .at-tracking-pill{filter:saturate(.45)}
+.at-tracking-pill{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:800;line-height:1.4;white-space:normal}
+.at-track-status-blue{background:#263d5d!important;color:#a9ccff!important}
+.at-track-status-amber{background:#4b3522!important;color:#f4be69!important}
+.at-track-status-green{background:#203f32!important;color:#96d9ae!important}
+.at-track-status-muted{background:#2a3039!important;color:#b1b8c5!important}
+html[data-theme="light"] .at-track-status-blue{background:#e5effe!important;color:#275184!important}
+html[data-theme="light"] .at-track-status-amber{background:#fff0dc!important;color:#955c12!important}
+html[data-theme="light"] .at-track-status-green{background:#e3f5e9!important;color:#276044!important}
+html[data-theme="light"] .at-track-status-muted{background:#eceff3!important;color:#535e6d!important}
+.at-customer-tracking .at-tracking-timeline li small{margin-top:9px;color:var(--cs-muted);font-weight:500}
+.at-tracking-event{padding:4px 0 17px;border-bottom:1px solid var(--cs-border);margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.at-tracking-event:last-child{border:0}
+.at-tracking-event strong{font-size:13px;line-height:1.55;overflow-wrap:anywhere;color:var(--cs-text)}
+.at-tracking-event span{font-size:12px;color:var(--cs-muted)}
+.at-tracking-waiting{background:var(--cs-soft);color:var(--cs-text);border-left:3px solid var(--cs-accent);padding:11px 14px;margin-bottom:20px;border-radius:8px;font-size:12px;line-height:1.6}
+@media(max-width:760px){.at-customer-tracking .at-tracking-details{grid-template-columns:1fr}.at-customer-tracking .at-tracking-card{padding:20px 17px}}

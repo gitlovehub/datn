@@ -1,0 +1,117 @@
+/* Visual adaptation of the existing LIVE booking form to ATELIER.
+   Business state, validation, requests and API are deliberately untouched. */
+.cs-customer-layout .at-booking-legacy { background:var(--cs-bg)!important;color:var(--cs-text)!important;font-family:"DM Sans",system-ui,sans-serif; }
+.at-booking-legacy main {max-width:1050px}
+.at-booking-legacy h1,.at-booking-legacy h2,.at-booking-legacy h3 {font-family:Manrope,system-ui,sans-serif;letter-spacing:-.035em}
+.at-booking-legacy h1 {font-size:clamp(26px,3vw,38px)}
+.at-booking-legacy .bg-white {background-color:var(--cs-surface)!important}
+.at-booking-legacy .bg-slate-50 {background-color:var(--cs-bg)!important}
+.at-booking-legacy .bg-slate-100 {background-color:var(--cs-surface-2)!important}
+.at-booking-legacy .bg-slate-200 {background-color:var(--cs-border)!important}
+.at-booking-legacy .text-slate-900,.at-booking-legacy .text-slate-800,.at-booking-legacy .text-slate-700 {color:var(--cs-text)!important}
+.at-booking-legacy .text-slate-600,.at-booking-legacy .text-slate-500,.at-booking-legacy .text-slate-400 {color:var(--cs-muted)!important}
+.at-booking-legacy .border-slate-100,.at-booking-legacy .border-slate-200,.at-booking-legacy .border-slate-300 {border-color:var(--cs-border)!important}
+.at-booking-legacy .bg-\[\#1F2933\] {background:#cf2935!important;color:white!important}
+.at-booking-legacy .text-\[\#1F2933\] {color:var(--cs-text)!important}
+.at-booking-legacy .bg-\[\#F3E8D2\] {background:var(--cs-soft)!important}
+.at-booking-legacy .text-\[\#B68A43\],.at-booking-legacy .text-\[\#D6A85F\],.at-booking-legacy .text-\[\#9A7336\] {color:var(--cs-accent)!important}
+.at-booking-legacy button:focus-visible,.at-booking-legacy a:focus-visible,.at-booking-legacy input:focus-visible {outline:2px solid var(--cs-accent);outline-offset:2px}
+.at-booking-legacy input,.at-booking-legacy select,.at-booking-legacy textarea {background:var(--cs-surface);color:var(--cs-text);border-color:var(--cs-border);font:inherit}
+.at-booking-legacy input::placeholder,.at-booking-legacy textarea::placeholder {color:var(--cs-muted);opacity:.7}
+html[data-theme="dark"] .at-booking-legacy .bg-emerald-50 {background:#213c32!important}
+html[data-theme="dark"] .at-booking-legacy .bg-red-50 {background:#42262a!important}
+html[data-theme="dark"] .at-booking-legacy .bg-amber-50 {background:#403321!important}
+html[data-theme="dark"] .at-booking-legacy .bg-blue-50 {background:#23354c!important}
+html[data-theme="dark"] .at-booking-legacy .text-emerald-700 {color:#a1e7bc!important}
+html[data-theme="dark"] .at-booking-legacy .text-red-700 {color:#ffa2a2!important}
+html[data-theme="dark"] .at-booking-legacy .text-amber-700 {color:#f5d08b!important}
+html[data-theme="dark"] .at-booking-legacy input[type=date]{color-scheme:dark}
+@media(max-width:600px){.at-booking-legacy main{padding-left:16px;padding-right:16px}.at-booking-legacy h1{font-size:25px}}
+
+/* Customer booking adopts ATELIER composition while retaining existing Laravel request/validation flow. */
+.cs-customer-layout .at-booking-legacy main{max-width:1210px;margin:auto;padding-top:34px}
+.at-booking-legacy main>div:nth-child(2){text-align:left!important;margin-bottom:26px}
+.at-booking-legacy main>div:nth-child(2) h1{font-size:clamp(30px,4vw,46px);font-weight:850;letter-spacing:-.055em}
+.at-booking-legacy main>div:nth-child(2) p{margin-left:0;margin-right:0;max-width:none}
+.at-booking-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.88fr);gap:24px;align-items:start}
+.at-booking-grid>.bg-white{min-width:0;padding:24px!important;border-radius:19px!important;box-shadow:none!important}
+.at-booking-help{background:var(--cs-surface);border:1px solid var(--cs-border);border-radius:19px;padding:28px 26px;position:sticky;top:106px;min-height:430px}
+.at-booking-help-label{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--cs-accent);margin-bottom:13px}
+.at-booking-help h2{font:800 24px/1.25 Manrope,system-ui,sans-serif;letter-spacing:-.04em;margin-bottom:20px}
+.at-booking-help ol{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:20px}
+.at-booking-help li{position:relative;padding-left:29px}
+.at-booking-help li::before{content:"";position:absolute;top:4px;left:2px;width:14px;height:14px;border:2px solid var(--cs-accent);border-radius:100%}
+.at-booking-help li strong{display:block;font-size:13px;font-weight:800;margin-bottom:6px}
+.at-booking-help li small{font-size:12px;color:var(--cs-muted);line-height:1.55}
+.at-booking-note-bottom{margin-top:30px;border-radius:12px;border-left:3px solid var(--cs-accent);padding:15px;background:var(--cs-soft);color:var(--cs-muted);font-size:12px;line-height:1.7}
+.at-booking-legacy .bg-\[\#1F2933\]:hover{background:#b82531!important}
+.at-booking-legacy button:disabled{opacity:.45}
+@media(max-width:920px){.at-booking-grid{grid-template-columns:1fr}.at-booking-help{position:static;min-height:0}.at-booking-help ol{display:grid;grid-template-columns:1fr 1fr}.at-booking-grid>.bg-white{padding:18px!important}}
+@media(max-width:570px){.at-booking-help ol{grid-template-columns:1fr}.at-booking-legacy main>div:nth-child(2){text-align:center!important}.at-booking-legacy main>div:nth-child(2) p{margin:auto}}
+
+/* ATELIER: visible red markers in booking notes (dark and light), no invisible pseudo-element. */
+.at-booking-help ol{position:relative}
+.at-booking-help li::before{content:"";position:absolute;top:4px;left:1px;width:15px;height:15px;border:1.5px solid #cf2935;border-radius:50%;background:var(--cs-surface);box-shadow:inset 0 0 0 4px var(--cs-surface),inset 0 0 0 8px #cf2935}
+.at-booking-help li::after{content:"";position:absolute;top:23px;left:8px;bottom:-18px;width:1px;background:var(--cs-border);pointer-events:none}
+.at-booking-help li:last-child::after{display:none}
+
+/* Vehicle categories and service cards: restrained hover, vivid selection, readable text. */
+.at-booking-legacy .at-vehicle-type-card,.at-booking-legacy .at-service-package-card {
+  background:var(--cs-surface)!important;color:var(--cs-text)!important;border:1.5px solid var(--cs-border)!important;
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+.at-booking-legacy .at-vehicle-type-option:hover .at-vehicle-type-card,
+.at-booking-legacy .at-service-package-option:hover .at-service-package-card {
+  background:var(--cs-surface-2)!important;border-color:#c4646b!important;transform:translateY(-1px);
+}
+.at-booking-legacy .at-vehicle-type-option input:checked + .at-vehicle-type-card,
+.at-booking-legacy .at-service-package-option input:checked + .at-service-package-card {
+  background:var(--cs-soft)!important;border-color:var(--cs-accent)!important;box-shadow:0 0 0 1px var(--cs-accent)!important;
+}
+.at-booking-legacy .at-vehicle-type-option input:checked + .at-vehicle-type-card i {color:var(--cs-accent)!important}
+.at-booking-legacy .at-vehicle-type-option :is(span,i),
+.at-booking-legacy .at-service-package-option h3 {color:var(--cs-text)!important}
+.at-booking-legacy .at-vehicle-type-option input:focus-visible + .at-vehicle-type-card,
+.at-booking-legacy .at-service-package-option input:focus-visible + .at-service-package-card {
+  outline:2px solid var(--cs-accent);outline-offset:3px;
+}
+.at-booking-legacy .at-booking-branch-card {
+  background:var(--cs-surface)!important;color:var(--cs-text)!important;border-color:var(--cs-border)!important;
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.at-booking-legacy .at-booking-branch-option:hover .at-booking-branch-card {
+  background:var(--cs-surface-2)!important;border-color:var(--cs-accent)!important;
+}
+.at-booking-legacy .at-booking-branch-card.is-selected {
+  background:var(--cs-soft)!important;border-color:var(--cs-accent)!important;box-shadow:0 0 0 1px var(--cs-accent)!important;
+}
+.at-booking-legacy .at-booking-branch-card :is(.text-slate-800,.text-slate-500) {color:var(--cs-text)!important}
+.at-booking-legacy .at-booking-branch-status {color:#000!important}
+html[data-theme="dark"] .cs-customer-layout .at-booking-legacy .at-booking-branch-status {color:#000!important}
+.at-booking-legacy .at-booking-branch-option input:focus-visible + .at-booking-branch-card {
+  outline:2px solid var(--cs-accent);outline-offset:3px;
+}
+.at-booking-legacy .at-booking-date-option {
+  background:var(--cs-surface)!important;border-color:var(--cs-border)!important;color:var(--cs-text)!important;
+  transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.at-booking-legacy .at-booking-date-option:not(.is-selected):hover {
+  background:var(--cs-surface-2)!important;border-color:var(--cs-accent)!important;
+}
+.at-booking-legacy .at-booking-date-option.is-selected {
+  background:var(--cs-accent)!important;border-color:var(--cs-accent)!important;color:#fff!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--cs-accent) 22%,transparent)!important;
+}
+.at-booking-legacy .at-booking-date-option .at-booking-date-day {color:var(--cs-muted)!important}
+.at-booking-legacy .at-booking-date-option.is-selected .at-booking-date-day {color:#fff!important}
+.at-booking-legacy .at-booking-date-option:focus-visible {outline:2px solid var(--cs-accent);outline-offset:3px}
+.at-booking-legacy .at-booking-stepper-track,
+.at-booking-legacy .at-booking-stepper-progress {
+  left:12.5%;top:20px;transform:translateY(-50%);
+}
+.at-booking-legacy .at-booking-stepper-track {right:12.5%}
+@media(min-width:640px) {
+  .at-booking-legacy .at-booking-stepper-track,
+  .at-booking-legacy .at-booking-stepper-progress {top:22px}
+}
+@media (prefers-reduced-motion:reduce){.at-booking-legacy .at-vehicle-type-card,.at-booking-legacy .at-service-package-card{transition:none!important;transform:none!important}}

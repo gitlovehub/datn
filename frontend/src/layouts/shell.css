@@ -1,0 +1,332 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap");
+/* ATELIER: React shell scopes tokens per role, legacy modules remain editable. */
+.cs-shell {
+  --cs-bg: #f7f7f6; --cs-surface: #fff; --cs-surface-2: #f1f1ef;
+  --cs-text: #191919; --cs-muted: #747777; --cs-border: #e9e9e6;
+  --cs-accent: #cf2935; --cs-accent-contrast: #fff; --cs-soft: #fff1f1; --cs-accent-contrast: #fff;
+  color: var(--cs-text); background: var(--cs-bg); min-height: 100vh;
+  font-family: "DM Sans", "Inter", system-ui, sans-serif;
+}
+.cs-shell[data-area="advisor"] { --cs-accent: #a77a2e; --cs-soft: #fbf2de; }
+.cs-shell[data-area="admin"] { --cs-accent: #507b2c; --cs-soft: #f0f8e9; }
+html[data-theme="dark"] .cs-shell {
+  --cs-bg: #111214; --cs-surface: #191b1e; --cs-surface-2: #22252a;
+  --cs-text: #f5f5f4; --cs-muted: #a1a5ad; --cs-border: #34373a;
+  --cs-soft: #382226;
+}
+html[data-theme="dark"] .cs-shell[data-area="advisor"] { --cs-accent: #e9bf72; --cs-accent-contrast: #1e1b14; --cs-soft: #302719; }
+html[data-theme="dark"] .cs-shell[data-area="admin"] { --cs-accent: #c5ff64; --cs-accent-contrast: #141a0e; --cs-soft: #26351c; }
+.cs-shell a { text-decoration: none; }
+.cs-shell .cs-brand { display: inline-flex; align-items:center; gap:10px; flex-shrink:0; font-family: Manrope, system-ui, sans-serif; font-size:21px; font-weight:800; letter-spacing:-.065em; color:inherit; white-space:nowrap; line-height:1.1; }
+.cs-brand-mark { transform:rotate(-9deg); width:34px; height:34px; border-radius:10px; display:grid; place-items:center; font-size:17px; color:var(--cs-accent-contrast); background:var(--cs-accent); }
+.cs-brand small {display:block; font-size:9px; font-weight:800; letter-spacing:.13em; line-height:1.65; color:var(--cs-muted); }
+.cs-icon-button { display:inline-flex; align-items:center; justify-content:center; width:40px;height:40px; background:var(--cs-surface); border:1px solid var(--cs-border); border-radius:11px;color:var(--cs-text); flex-shrink:0; cursor:pointer; transition:border-color .2s; }
+.cs-icon-button:hover { border-color:var(--cs-accent); }
+.cs-workspace { display:grid; grid-template-columns:250px minmax(0,1fr); }
+.cs-work-sidebar { position:sticky;top:0; height:100vh;z-index:60; background:#211f1b; color:#f6f4ef; padding:25px 17px 16px; display:flex;flex-direction:column; overflow-y:auto; }
+.cs-workspace[data-area="admin"] .cs-work-sidebar {background:#111713; }
+.cs-sidebar-brand {padding:0 10px 24px; display:flex;align-items:center;justify-content:space-between; }
+.cs-work-sidebar .cs-brand small {color:#92948d;}
+.cs-workspace[data-area="advisor"] .cs-brand-mark {background:#ddb66e;color:#1e1b14;}
+.cs-workspace[data-area="admin"] .cs-brand-mark {background:#c6ff68;color:#162111;}
+.cs-nav-caption {padding:8px 13px 12px;letter-spacing:.2em;font-size:12px;font-weight:800;color:#828883;}
+.cs-side-nav {display:flex;flex-direction:column;gap:3px;}
+.cs-nav-link {display:flex;align-items:center;gap:12px;min-width:0;padding:12px 13px;border-radius:11px; font-size:13px;font-weight:700;transition:background .18s,color .18s;}
+.cs-side-nav .cs-nav-link {color:#a6aba8;}
+.cs-side-nav .cs-nav-link:hover {background:#ffffff12;color:#fff;}
+.cs-workspace[data-area="advisor"] .cs-side-nav .is-active {background:#dfb76e19;color:#e7be76;box-shadow:inset 3px 0 #e0b76d;}
+.cs-workspace[data-area="admin"] .cs-side-nav .is-active {background:#b8ff6814;color:#c9ff82;box-shadow:inset 3px 0 #c6ff68;}
+.cs-sidebar-bottom {margin-top:auto;padding:16px 12px 0;border-top:1px solid #ffffff18;display:grid;gap:10px;color:#909892;font-size:12px;}
+.cs-bottom-link {display:flex;align-items:center;gap:8px;color:#e8e9e4;}
+.cs-work-main {min-width:0;}
+.cs-work-top {position:sticky;top:0;z-index:45;min-height:77px; background:var(--cs-surface);border-bottom:1px solid var(--cs-border); padding:12px clamp(18px,3vw,44px); display:flex;justify-content:space-between;align-items:center;gap:16px; }
+.cs-title-group {display:flex;align-items:center;gap:13px;min-width:0;}
+.cs-title-group strong {display:block;font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cs-top-caption {display:block;color:var(--cs-muted);font-size:12px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;}
+.cs-user-controls {display:flex;align-items:center;gap:9px;}
+.cs-user-name {font-size:12px;color:var(--cs-muted);font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cs-work-content {min-width:0; padding-bottom:45px;}
+.cs-menu-button,.cs-close-sidebar {display:none;}
+.cs-menu-scrim {display:none;}
+/* Old module page wrappers own 250px margins. New shell already handles offset. */
+@media (min-width:1024px) {
+  .cs-work-content .lg\:ml-\[250px\], .cs-customer-main .lg\:ml-\[250px\] { margin-left:0 !important; }
+}
+.cs-public-header {position:sticky;top:0;z-index:55;min-height:82px; background:var(--cs-surface); border-bottom:1px solid var(--cs-border);display:flex;align-items:center;justify-content:space-between;gap:24px; padding:14px clamp(16px,3vw,52px);}
+.cs-desktop-navigation{flex:1;display:flex;justify-content:center;min-width:0;}
+.cs-public-nav {display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:clamp(8px,1.7vw,21px);}
+.cs-public-nav .cs-nav-link {padding:9px 5px;color:var(--cs-muted);gap:7px;font-size:12px;white-space:nowrap;}
+.cs-public-nav .cs-nav-link.is-active{color:var(--cs-accent);}
+.cs-public-nav .cs-nav-link:hover{color:var(--cs-text);}
+.cs-account-link {height:36px;width:36px;border-radius:10px;display:grid;place-items:center;color:var(--cs-accent-contrast)!important;background:var(--cs-accent);font-size:12px;font-weight:800;}
+.cs-customer-main{min-height:calc(100vh - 160px);}
+.cs-public-footer{background:var(--cs-surface);border-top:1px solid var(--cs-border);padding:30px clamp(20px,5vw,76px);font-size:12px;color:var(--cs-muted);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cs-mobile-public-nav {display:none;}
+/* Reusable components in src/components/ui */
+/* Shared Button, Card, PageHeading and EmptyState are now Tailwind v4
+   utilities in components/ui/index.tsx. The card spacing contract remains. */
+.cs-card + .cs-card {margin-top:16px}
+.cs-pill{font-size:12px;font-weight:800;color:var(--cs-accent);background:var(--cs-soft);border-radius:999px;padding:6px 11px;}
+.cs-text-link{display:inline-block;color:var(--cs-accent);font-size:13px;font-weight:700;margin-top:15px;}
+
+.cs-placeholder{width:min(100%,1100px);margin:0 auto;padding:30px clamp(16px,3vw,42px);}
+/* Dark scheme for the legacy Tailwind pages embedded inside the shell. */
+html[data-theme="dark"] .cs-shell .bg-white,html[data-theme="dark"] .cs-shell .bg-\[\#F7F7F5\],html[data-theme="dark"] .cs-shell .bg-slate-50 {background-color:var(--cs-surface)!important;}
+html[data-theme="dark"] .cs-shell .text-\[\#20252B\],html[data-theme="dark"] .cs-shell .text-\[\#1F2933\],html[data-theme="dark"] .cs-shell .text-slate-900,html[data-theme="dark"] .cs-shell .text-slate-800 {color:var(--cs-text)!important;}
+html[data-theme="dark"] .cs-shell .text-slate-500,html[data-theme="dark"] .cs-shell .text-slate-600,html[data-theme="dark"] .cs-shell .text-\[\#66717C\] {color:var(--cs-muted)!important;}
+html[data-theme="dark"] .cs-shell input,html[data-theme="dark"] .cs-shell select,html[data-theme="dark"] .cs-shell textarea {background-color:var(--cs-surface-2);color:var(--cs-text);border-color:var(--cs-border);}
+@media (max-width:1150px){.cs-desktop-navigation{display:none;}.cs-customer-layout .cs-menu-button{display:inline-flex;}.cs-public-header{gap:12px;}.cs-mobile-public-nav{position:sticky;top:82px;z-index:55;display:block;padding:8px 16px 16px;background:var(--cs-surface);border-bottom:1px solid var(--cs-border);}.cs-mobile-public-nav .cs-public-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;}.cs-mobile-public-nav .cs-nav-link{padding:12px;background:var(--cs-surface-2);border-radius:9px;}}
+@media (max-width:900px){.cs-workspace{display:block;}.cs-work-sidebar{position:fixed;top:0;bottom:0;left:0;width:min(290px,86vw);height:100dvh;transform:translateX(-105%);transition:transform .22s;z-index:101;box-shadow:15px 0 60px #0002;}.cs-work-sidebar.is-open{transform:translateX(0);}.cs-menu-scrim{display:block;position:fixed;inset:0;z-index:100;background:#0009;border:0;}.cs-menu-button,.cs-close-sidebar{display:inline-flex;}.cs-user-name{display:none;}}
+@media (max-width:560px){.cs-public-header{padding:12px 14px;min-height:72px;}.cs-brand{font-size:18px!important;}.cs-public-header .cs-brand small{font-size:8px;}.cs-public-header .cs-user-controls .cs-user-name,.cs-public-header .cs-account-link{display:none;}.cs-mobile-public-nav{top:72px;}.cs-icon-button{width:36px;height:36px;}.cs-work-top{gap:7px;padding:10px 12px;}.cs-work-top .cs-top-caption{font-size:12px;}.cs-work-content{overflow-x:clip;}.cs-placeholder{padding:24px 14px;}.cs-public-footer{padding:24px 18px;}}
+
+.cs-auth-error {margin:44px auto; max-width:560px; border:1px solid #e8c8a8; padding:22px; border-radius:14px; background:#fff8ec; color:#422b1c; line-height:1.6;}
+.cs-auth-error button {display:block;margin-top:12px;background:#b86b20;border:0;border-radius:9px;padding:9px 15px;color:white;cursor:pointer;}
+
+/* Role-aware legacy module bridge. Existing modules keep their API and behavior;
+   only hard-coded UI colors are translated to ATELIER tokens. */
+.cs-workspace { color-scheme: light; }
+html[data-theme="dark"] .cs-workspace { color-scheme: dark; }
+.cs-workspace :is(a,button,input,select,textarea):focus-visible {outline:2px solid var(--cs-accent);outline-offset:2px}
+.cs-workspace :is(button,a).cs-button:hover {filter:brightness(.93)}
+.cs-workspace .cs-icon-button {color:var(--cs-text)}
+.cs-workspace :is(input,select,textarea) {accent-color:var(--cs-accent)}
+.cs-workspace[data-area="admin"] .cs-side-nav .is-active {background:#b8ff6814;color:#c9ff82}
+.cs-workspace[data-area="advisor"] .cs-side-nav .is-active {background:#dfb76e19;color:#e7be76}
+.cs-workspace .cs-work-main {background:var(--cs-bg);min-height:100vh}
+.cs-workspace .cs-work-top {background:var(--cs-surface)}
+.cs-workspace .cs-work-top .cs-top-caption {font-size:12px;font-weight:800}
+.cs-workspace .cs-work-top .cs-top-caption {color:var(--cs-muted)}
+.cs-workspace .cs-work-top .cs-title-group strong {font-size:13px}
+.cs-workspace .cs-user-controls::before {content:"●  WORKSPACE";display:inline-block;color:var(--cs-accent);background:var(--cs-soft);font-size:12px;letter-spacing:.05em;font-weight:800;border-radius:999px;padding:8px 12px;margin-right:4px}
+@media(max-width:540px){.cs-workspace .cs-user-controls::before{display:none}}
+
+/* advisor legacy accent */
+.cs-workspace[data-area="advisor"] .bg-\[\#D6A85F\] {background-color:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important}
+.cs-workspace[data-area="advisor"] :is(a,button).border-\[\#D6A85F\] {border-color:var(--cs-accent)!important}
+.cs-workspace[data-area="advisor"] .text-\[\#D6A85F\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="advisor"] .text-\[\#B28A49\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="advisor"] .text-\[\#B68A43\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="advisor"] .text-\[\#9A7336\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="advisor"] :is(a,button).bg-\[\#1F2933\] {background:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important}
+
+/* admin legacy accent */
+.cs-workspace[data-area="admin"] .bg-\[\#D6A85F\] {background-color:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important}
+.cs-workspace[data-area="admin"] :is(a,button).border-\[\#D6A85F\] {border-color:var(--cs-accent)!important}
+.cs-workspace[data-area="admin"] .text-\[\#D6A85F\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="admin"] .text-\[\#B28A49\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="admin"] .text-\[\#B68A43\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="admin"] .text-\[\#9A7336\] {color:var(--cs-accent)!important}
+.cs-workspace[data-area="admin"] :is(a,button).bg-\[\#1F2933\] {background:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important}
+
+/* Dark: surfaces, neutral copy, structural borders from Tailwind-era pages. */
+html[data-theme="dark"] .cs-workspace .bg-white {background-color:var(--cs-surface)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#F7F7F5\] {background-color:var(--cs-bg)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#F3F4F2\] {background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#FAFAF8\] {background-color:var(--cs-surface)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#FAFAF9\] {background-color:var(--cs-surface)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#FCFCFA\] {background-color:var(--cs-surface)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#F1F2F3\] {background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#EEF0F2\] {background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#ECEEED\] {background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#F0F1EF\] {background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#F3E8D2\] {background-color:var(--cs-soft)!important}
+html[data-theme="dark"] .cs-workspace .bg-slate-50 {background-color:var(--cs-surface)!important}
+html[data-theme="dark"] .cs-workspace .bg-slate-100 {background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .bg-slate-800 {background-color:#262a2f!important}
+html[data-theme="dark"] .cs-workspace .bg-slate-900 {background-color:#22262a!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#1F2933\] {background-color:#25292f!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#151D24\] {background-color:#25292f!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#20252B\] {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#1F2933\] {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#374151\] {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#3A3020\] {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#66717C\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#8A949E\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#8A9299\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#A0A8AF\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#A0A8AE\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#AEB8C1\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#8F9AA4\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#7B858F\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#5F6871\] {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-slate-900 {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-slate-800 {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-slate-700 {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .text-slate-600 {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-slate-500 {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .text-slate-400 {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#E1E4E6\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#D9DDE1\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#EEF0F2\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#E5E8EA\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#D5D9DC\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#F0F1EF\] {border-color:var(--cs-border)!important}
+
+/* Fixed dark-on-dark text and form controls from older components. */
+html[data-theme="dark"] .cs-workspace :is(input,textarea,select){background:var(--cs-surface-2)!important;color:var(--cs-text)!important;border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace :is(input,textarea)::placeholder {color:var(--cs-muted)!important;opacity:1}
+html[data-theme="dark"] .cs-workspace :is(table,thead,tbody,tr,th,td){border-color:var(--cs-border)}
+html[data-theme="dark"] .cs-workspace :is(th,td){color:var(--cs-text)}
+html[data-theme="dark"] .cs-workspace .bg-white\/10 {background-color:#ffffff1a!important}
+html[data-theme="dark"] .cs-workspace .text-black {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-workspace .border-white\/20 {border-color:#ffffff36!important}
+html[data-theme="dark"] .cs-workspace :is(button,a):disabled {opacity:.55}
+/* Old gold primary CTA must be legible on the light role accent in dark mode. */
+html[data-theme="dark"] .cs-workspace :is(button,a).bg-\[\#D6A85F\] {background:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important}
+html[data-theme="dark"] .cs-workspace :is(button,a).bg-\[\#1F2933\] {background:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important}
+html[data-theme="dark"] .cs-workspace :is(button,a).bg-\[\#D6A85F\] :is(span,svg),html[data-theme="dark"] .cs-workspace :is(button,a).bg-\[\#1F2933\] :is(span,svg){color:inherit!important}
+/* Colored badges, soft panels and validation states remain readable on dark surfaces. */
+html[data-theme="dark"] .cs-workspace .bg-\[\#EEF7EF\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#EEF7F0\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#E7F3E8\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#E6F2E8\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#EDF7EF\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#F0F7EF\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#F0F7F0\] {background-color:#203b2b!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#FDEEEE\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#FBEFEF\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#FBE5E5\] {background-color:#48262b!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#F7F2E9\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#F8EBD3\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#FFF6E6\],
+html[data-theme="dark"] .cs-workspace .bg-\[\#F5F1E8\] {background-color:#403321!important}
+html[data-theme="dark"] .cs-workspace .bg-\[\#EEF4FA\] {background-color:#27374c!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#A24A4A\],
+html[data-theme="dark"] .cs-workspace .text-\[\#A12B2B\],
+html[data-theme="dark"] .cs-workspace .text-\[\#D9AAAA\] {color:#ff9faa!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#3F7047\],
+html[data-theme="dark"] .cs-workspace .text-\[\#28643B\],
+html[data-theme="dark"] .cs-workspace .text-\[\#397044\],
+html[data-theme="dark"] .cs-workspace .text-\[\#39734A\],
+html[data-theme="dark"] .cs-workspace .text-\[\#315B35\],
+html[data-theme="dark"] .cs-workspace .text-\[\#35633B\] {color:#8ee0a7!important}
+html[data-theme="dark"] .cs-workspace .text-\[\#9A6B22\],
+html[data-theme="dark"] .cs-workspace .text-\[\#6D542A\],
+html[data-theme="dark"] .cs-workspace .text-\[\#5B4630\],
+html[data-theme="dark"] .cs-workspace .text-\[\#8A5A13\],
+html[data-theme="dark"] .cs-workspace .text-\[\#876D35\] {color:#e9bf72!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#1F2933\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#EDEFF0\] {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#DCEBDD\],
+html[data-theme="dark"] .cs-workspace .border-\[\#D9E8D8\],
+html[data-theme="dark"] .cs-workspace .border-\[\#D8E8D9\],
+html[data-theme="dark"] .cs-workspace .border-\[\#D9E9DC\] {border-color:#355442!important}
+html[data-theme="dark"] .cs-workspace .border-\[\#E7C5C5\],
+html[data-theme="dark"] .cs-workspace .border-\[\#F0D6D6\] {border-color:#64363c!important}
+/* Interactive colors on light/dark follow role accent, not shared legacy gold. */
+.cs-workspace[data-area="advisor"] :is(a,button).hover\:bg-\[\#151D24\]:hover,
+.cs-workspace[data-area="admin"] :is(a,button).hover\:bg-\[\#151D24\]:hover {background:var(--cs-accent)!important;color:var(--cs-accent-contrast)!important;filter:brightness(.91)}
+.cs-workspace :is(a,button).bg-\[\#D6A85F\]:hover{filter:brightness(.92)}
+@media print{.cs-work-sidebar,.cs-work-top{display:none!important}.cs-workspace{display:block}.cs-work-main{background:white!important}}
+html[data-theme="dark"] .cs-workspace :is(input[type="checkbox"],input[type="radio"]){background:initial!important;accent-color:var(--cs-accent)!important;color:var(--cs-text)}
+
+/* Customer legacy modules: dark-mode contrast and red ATELIER accents. */
+.cs-customer-layout .cs-public-header {min-height:82px}
+.cs-customer-layout .cs-nav-link.is-active {box-shadow:0 2px 0 var(--cs-accent);}
+.cs-customer-layout .cs-account-link:hover {filter:brightness(.9)}
+.cs-customer-layout .cs-customer-main :is(a,button).bg-\[\#D6A85F\] {background:#cf2935!important;color:#fff!important}
+.cs-customer-layout .cs-customer-main .text-\[\#D6A85F\],.cs-customer-layout .cs-customer-main .text-\[\#B68A43\] {color:var(--cs-accent)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .bg-white {background:var(--cs-surface)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .bg-slate-50,
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .bg-\[\#F7F7F5\] {background:var(--cs-bg)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .bg-slate-100,
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .bg-\[\#F3F4F2\] {background:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.text-slate-900,.text-slate-800,.text-slate-700,.text-\[\#20252B\],.text-\[\#1F2933\]) {color:var(--cs-text)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.text-slate-600,.text-slate-500,.text-slate-400,.text-\[\#66717C\],.text-\[\#8A949E\]) {color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.border-slate-100,.border-slate-200,.border-\[\#E1E4E6\]) {border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main input,
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main select,
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main textarea {color:var(--cs-text);background:var(--cs-surface);border-color:var(--cs-border)}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(input,textarea)::placeholder{color:var(--cs-muted);opacity:.8}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.bg-emerald-50,.bg-green-50){background:#233c30!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.bg-red-50,.bg-rose-50){background:#44262d!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .bg-amber-50{background:#3b3022!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.text-emerald-700,.text-green-700){color:#9ce7bd!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main :is(.text-red-700,.text-rose-700){color:#ffa4ac!important}
+html[data-theme="dark"] .cs-customer-layout .cs-customer-main .text-amber-700{color:#f4d08a!important}
+
+/* 2026-10-19 regression fix: legible rows/buttons in Light AND Dark. */
+.cs-workspace{--cs-row-hover:#f0f3ef;--cs-action-bg:#426b30;--cs-action-text:#fff}
+html[data-theme="dark"] .cs-workspace{--cs-row-hover:#252a2b}
+html[data-theme="dark"] .cs-workspace[data-area="admin"]{--cs-row-hover:#232b25;--cs-action-bg:#3d612f;--cs-action-text:#f8fff3}
+html[data-theme="dark"] .cs-workspace[data-area="advisor"]{--cs-row-hover:#292620;--cs-action-bg:#967338;--cs-action-text:#fff8eb}
+.cs-workspace tbody tr:hover,.cs-workspace tbody tr.cs-readable-row:hover{background:var(--cs-row-hover)!important;color:var(--cs-text)!important}
+.cs-workspace tbody tr:hover :is(td,th){background-color:transparent!important}
+.cs-workspace :is(table,tbody) tr{transition:background-color .14s ease}
+/* Do not let Tailwind's fixed light hover variants paint white over dark text. */
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-\[\#F7F7F5\]:hover,
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-\[\#F3F4F2\]:hover,
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-\[\#FAFAF8\]:hover,
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-\[\#FAFAF9\]:hover,
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-slate-50:hover,
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-slate-100:hover{background:var(--cs-surface-2)!important;color:var(--cs-text)!important}
+/* Admin: keep brand neon as small accents, not large fills with invisible text. */
+.cs-workspace[data-area="admin"] :is(a,button).bg-\[\#1F2933\]{background:var(--cs-action-bg)!important;color:var(--cs-action-text)!important}
+html[data-theme="dark"] .cs-workspace[data-area="admin"] :is(a,button).bg-\[\#1F2933\]{background:var(--cs-action-bg)!important;color:var(--cs-action-text)!important}
+.cs-workspace[data-area="admin"] .cs-admin-current-tile{background:#25452d!important;border-color:#395e40!important;color:#f5fff2!important}
+.cs-workspace[data-area="admin"] .cs-admin-current-tile:hover{background:#2d5336!important}
+.cs-workspace[data-area="admin"] .cs-admin-current-tile p{color:#f5fff2!important}
+.cs-workspace[data-area="admin"] .cs-admin-current-tile p:last-child{color:#b7cdb8!important}
+.cs-workspace[data-area="admin"] .cs-admin-current-icon{background:#3d6242!important;color:#eaffd0!important}
+html[data-theme="dark"] .cs-workspace[data-area="admin"] .ws-metric-featured{background:#345928;border-color:#456c36;color:#fff}
+html[data-theme="dark"] .cs-workspace[data-area="admin"] .ws-button-primary{background:#a8e76d;color:#15200d!important}
+/* Keep modal controls and accent badges readable when admin dark mode is active. */
+.cs-workspace[data-area="admin"] :is(a,button).hover\:bg-\[\#151D24\]:hover{background:#365b2b!important;color:#fff!important;filter:none}
+html[data-theme="dark"] .cs-workspace[data-area="admin"] :is(.bg-\[\#D6A85F\]).text-white{color:#182414!important}
+
+/* Admin module-switch cards, role-safe hover colors (ATELIER). */
+/* AdminHubNav is styled with Tailwind v4 utilities in AdminHubNav.tsx. */
+/* Customer navigation: persist active treatment at booking and alias routes. */
+.cs-customer-layout .cs-public-nav .cs-nav-link{position:relative;color:var(--cs-muted);transition:color .15s}
+.cs-customer-layout .cs-public-nav .cs-nav-link:is(:hover,.is-active){color:var(--cs-text)}
+.cs-customer-layout .cs-public-nav .cs-nav-link.is-active::after{content:"";height:2px;background:var(--cs-accent);position:absolute;bottom:-18px;left:5px;right:5px;border-radius:9px}
+.cs-customer-layout .cs-public-nav .cs-nav-link.is-active{box-shadow:none}
+.cs-customer-layout .cs-public-nav .cs-nav-link.is-active svg{color:var(--cs-accent)}
+@media(max-width:1150px){.cs-customer-layout .cs-public-nav .cs-nav-link.is-active::after{bottom:0;left:9px;right:auto;width:4px;height:100%}}
+/* Admin hover: no white flashes from outdated legacy Tailwind rules. */
+.cs-workspace[data-area="admin"] tbody tr:hover{background:#eaf0e9!important}
+html[data-theme="dark"] .cs-workspace[data-area="admin"] tbody tr:hover{background:#222c25!important}
+.cs-workspace[data-area="admin"] tbody tr:hover :is(td,th){color:var(--cs-text)!important;background:transparent!important}
+.cs-workspace[data-area="admin"] :is(.hover\:bg-\[\#FAFAF8\],.hover\:bg-\[\#FAFAF9\],.hover\:bg-\[\#F7F7F5\]):hover{background:var(--cs-surface-2)!important}
+
+/* Demo polish 2026-10-23 — semantic controls, accessible contrast, consistent sizing. */
+.cs-feedback-layer { --cs-bg:#f7f7f6; --cs-surface:#fff; --cs-surface-2:#f1f1ef; --cs-text:#191919; --cs-muted:#60676b; --cs-border:#dedfdd; --cs-accent:#cf2935; --cs-accent-contrast:#fff; --cs-soft:#fff1f1; color:var(--cs-text); }
+.cs-feedback-layer[data-area="advisor"] { --cs-accent:#a77a2e; --cs-accent-contrast:#fff; --cs-soft:#fbf2de; }
+.cs-feedback-layer[data-area="admin"] { --cs-accent:#507b2c; --cs-accent-contrast:#fff; --cs-soft:#f0f8e9; }
+html[data-theme="dark"] .cs-feedback-layer { --cs-bg:#111214; --cs-surface:#191b1e; --cs-surface-2:#22252a; --cs-text:#f5f5f4; --cs-muted:#b0b5ba; --cs-border:#363b40; --cs-soft:#382226; }
+html[data-theme="dark"] .cs-feedback-layer[data-area="advisor"] { --cs-accent:#e9bf72; --cs-accent-contrast:#1e1b14; --cs-soft:#302719; }
+html[data-theme="dark"] .cs-feedback-layer[data-area="admin"] { --cs-accent:#c5ff64; --cs-accent-contrast:#141a0e; --cs-soft:#26351c; }
+.cs-appointment-page :is(button,a){min-height:36px}
+.cs-appointment-page :is(button,a).cs-unified-btn{min-height:40px}
+.cs-info-panel {background:var(--cs-surface-2)!important;border:1px solid var(--cs-border)!important;color:var(--cs-text)!important;border-radius:13px}
+.cs-info-panel :is(p,dd,dt,span){color:inherit}
+.cs-info-panel .cs-muted-label{color:var(--cs-muted)!important}
+.cs-appointment-page .cs-status-pending{background:#3d3018;color:#f9cf74;border:1px solid #76582e}
+.cs-appointment-page .cs-status-confirmed{background:#1a3455;color:#a2cbff;border:1px solid #31557f}
+.cs-appointment-page .cs-status-checked{background:#153d32;color:#90e6bc;border:1px solid #306c55}
+.cs-appointment-page .cs-status-cancelled{background:#4d222c;color:#ffb2be;border:1px solid #7b3642}
+html[data-theme="light"] .cs-appointment-page .cs-status-pending{background:#fff3d7;color:#7d5717;border-color:#e5c47a}
+html[data-theme="light"] .cs-appointment-page .cs-status-confirmed{background:#e9f2ff;color:#214c86;border-color:#b3cef5}
+html[data-theme="light"] .cs-appointment-page .cs-status-checked{background:#e5f7ed;color:#1b6540;border-color:#a6dab8}
+html[data-theme="light"] .cs-appointment-page .cs-status-cancelled{background:#ffedf0;color:#8c253c;border-color:#edafbb}
+/* Fix white/light backgrounds on cards and hover in legacy forms without flattening their status badges. */
+html[data-theme="dark"] .cs-workspace .cs-appointment-page .bg-slate-50\/60,
+html[data-theme="dark"] .cs-workspace .cs-appointment-page .bg-slate-50\/70{background-color:var(--cs-surface-2)!important}
+html[data-theme="dark"] .cs-workspace .cs-appointment-page :is(.border-slate-100,.border-slate-200){border-color:var(--cs-border)!important}
+html[data-theme="dark"] .cs-workspace .cs-appointment-page :is(.text-slate-700,.text-slate-600,.text-slate-500){color:var(--cs-muted)!important}
+html[data-theme="dark"] .cs-workspace .cs-appointment-page .text-slate-900 {color:var(--cs-text)!important}
+.cs-workspace :is(button,a,select,input,textarea){transition:background-color .18s ease,color .18s ease,border-color .18s ease}
+.cs-workspace :is(button,a):focus-visible{outline:2px solid var(--cs-accent);outline-offset:2px}
+/* Interactive items may be hovered in dark mode without turning light grey or hiding labels. */
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-slate-50:hover,
+html[data-theme="dark"] .cs-workspace :is(button,a).hover\:bg-slate-100:hover{background:var(--cs-surface-2)!important;color:var(--cs-text)!important}
+@media(max-width:640px){.cs-unified-btn{min-height:42px}.cs-appointment-page .cs-unified-btn{min-height:42px}}
+/* Remaining contextual alert panels in legacy forms must never become pastel-on-white in Dark Mode. */
+html[data-theme="dark"] .cs-workspace .bg-rose-50 {background:#382327!important}
+html[data-theme="dark"] .cs-workspace :is(.text-rose-700,.text-rose-800){color:#ffbbc3!important}
+html[data-theme="dark"] .cs-workspace .bg-amber-50 {background:#393021!important}
+html[data-theme="dark"] .cs-workspace :is(.text-amber-700,.text-amber-800,.text-amber-900){color:#f4d399!important}
+html[data-theme="dark"] .cs-workspace .bg-emerald-50 {background:#203b30!important}
+html[data-theme="dark"] .cs-workspace :is(.text-emerald-700,.text-emerald-800){color:#b4f1ce!important}
+html[data-theme="dark"] .cs-workspace .bg-blue-50 {background:#1d324a!important}
+html[data-theme="dark"] .cs-workspace :is(.text-blue-700,.text-blue-800){color:#b2d7ff!important}

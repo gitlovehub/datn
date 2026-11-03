@@ -1,0 +1,186 @@
+/*
+ * Hệ thống nút thao tác dùng chung (CarService).
+ *
+ * 1. Lớp nền: mọi <button> và link dạng nút có cùng tốc độ chuyển, phản hồi khi nhấn,
+ *    viền focus bàn phím và trạng thái khóa — kể cả nút cũ chưa đổi class.
+ * 2. .cs-btn + biến thể: dùng cho nút thao tác của các luồng nghiệp vụ.
+ *    Màu lấy theo token khu vực (--cs-accent của khách / cố vấn / quản trị), có màu dự phòng
+ *    cho các trang ngoài shell (đăng nhập, đăng ký).
+ *
+ * Quy ước: mỗi khối thao tác chỉ một nút "primary" (bước tiếp theo của luồng), đặt cuối hàng;
+ * thao tác phụ dùng "secondary"/"ghost"; thao tác không hoàn tác được dùng "danger".
+ */
+
+/* ---------- 1. Lớp nền ---------- */
+:where(button, [role="button"], a.cs-btn, input[type="submit"], input[type="button"]) {
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.12s ease,
+    filter 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, [role="button"], input[type="submit"], input[type="button"]):not(:disabled):active {
+  transform: scale(0.98);
+}
+
+:where(button, [role="button"], a.cs-btn, input[type="submit"], input[type="button"]):focus-visible {
+  outline: 2px solid var(--cs-accent, #cf2935);
+  outline-offset: 2px;
+}
+
+:where(button, input[type="submit"], input[type="button"]):disabled,
+:where(button)[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
+
+/* ---------- 2. Nút thao tác chuẩn ---------- */
+.cs-btn,
+.cs-unified-btn {
+  --btn-bg: var(--cs-surface-2, #f1f1ef);
+  --btn-fg: var(--cs-text, #191919);
+  --btn-border: var(--cs-border, #e9e9e6);
+  --btn-hover-bg: var(--cs-soft, #fff1f1);
+  --btn-hover-border: var(--cs-accent, #cf2935);
+  --btn-hover-fg: var(--btn-fg);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  min-width: 86px;
+  padding: 9px 16px;
+  border: 1px solid var(--btn-border);
+  border-radius: 11px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  user-select: none;
+}
+
+.cs-btn:hover:not(:disabled),
+.cs-unified-btn:hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-border);
+  color: var(--btn-hover-fg);
+  box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.45);
+  transform: translateY(-1px);
+}
+
+.cs-btn:active:not(:disabled),
+.cs-unified-btn:active:not(:disabled) {
+  box-shadow: none;
+  transform: translateY(0) scale(0.98);
+}
+
+.cs-btn:focus-visible,
+.cs-unified-btn:focus-visible {
+  outline: 2px solid var(--cs-accent, #cf2935);
+  outline-offset: 3px;
+}
+
+/* Bước tiếp theo của luồng. */
+.cs-btn-primary,
+.cs-unified-primary {
+  --btn-bg: var(--cs-accent, #cf2935);
+  --btn-fg: var(--cs-accent-contrast, #fff);
+  --btn-border: var(--cs-accent, #cf2935);
+  --btn-hover-bg: color-mix(in srgb, var(--cs-accent, #cf2935) 88%, #000);
+  --btn-hover-border: color-mix(in srgb, var(--cs-accent, #cf2935) 88%, #000);
+}
+
+/* Thao tác phụ: quay lại, làm mới, in, lọc. */
+.cs-btn-secondary,
+.cs-unified-secondary {
+  --btn-bg: var(--cs-surface-2, #f1f1ef);
+  --btn-fg: var(--cs-text, #191919);
+  --btn-border: var(--cs-border, #e9e9e6);
+}
+
+/* Thao tác nhẹ trong danh sách: không viền, nền chỉ hiện khi rê chuột. */
+.cs-btn-ghost {
+  --btn-bg: transparent;
+  --btn-border: transparent;
+  --btn-hover-border: transparent;
+  min-width: 0;
+}
+
+/* Không hoàn tác được: hủy lịch, đóng phiếu, xóa. */
+.cs-btn-danger,
+.cs-unified-danger {
+  --btn-bg: #b91c1c;
+  --btn-fg: #fff;
+  --btn-border: #b91c1c;
+  --btn-hover-bg: #991b1b;
+  --btn-hover-border: #991b1b;
+}
+
+/* Hủy ở dạng viền (đặt cạnh nút chính, ít nổi bật hơn). */
+.cs-btn-danger-outline {
+  --btn-bg: transparent;
+  --btn-fg: #b91c1c;
+  --btn-border: color-mix(in srgb, #b91c1c 45%, transparent);
+  --btn-hover-bg: color-mix(in srgb, #b91c1c 10%, transparent);
+  --btn-hover-border: #b91c1c;
+}
+
+/* Xác nhận đã thu tiền / hoàn tất. */
+.cs-btn-success {
+  --btn-bg: #15803d;
+  --btn-fg: #fff;
+  --btn-border: #15803d;
+  --btn-hover-bg: #166534;
+  --btn-hover-border: #166534;
+}
+
+html[data-theme="dark"] .cs-btn-danger-outline {
+  --btn-fg: #fca5a5;
+  --btn-border: color-mix(in srgb, #f87171 45%, transparent);
+  --btn-hover-bg: color-mix(in srgb, #f87171 14%, transparent);
+  --btn-hover-border: #f87171;
+}
+
+.cs-btn-sm { min-height: 32px; min-width: 0; padding: 5px 12px; border-radius: 9px; font-size: 12px; }
+.cs-btn-lg { min-height: 46px; padding: 11px 22px; font-size: 14px; }
+.cs-btn-block { width: 100%; }
+
+/* Đang xử lý: giữ kích thước nút, hiện vòng quay trước chữ. */
+.cs-btn[aria-busy="true"]::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: cs-btn-spin 0.7s linear infinite;
+}
+
+@keyframes cs-btn-spin { to { transform: rotate(360deg); } }
+
+/* Hàng nút: thao tác phụ bên trái, bước tiếp theo bên phải; xuống dòng gọn trên điện thoại. */
+.cs-btn-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.cs-btn-row-end { justify-content: flex-end; }
+
+@media (max-width: 640px) {
+  .cs-btn, .cs-unified-btn { min-height: 44px; }
+  .cs-btn-row-end > .cs-btn { flex: 1 1 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-btn, .cs-unified-btn, :where(button, [role="button"]) { transition: none; }
+  .cs-btn:hover:not(:disabled), .cs-unified-btn:hover:not(:disabled) { transform: none; }
+}
